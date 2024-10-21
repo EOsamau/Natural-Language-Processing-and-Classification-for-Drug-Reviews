@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from xgboost import XGBClassifier
 import nltk
+import joblib
 
 # Download required NLTK data
 nltk.download('punkt')
@@ -60,11 +61,10 @@ class SentimentClassificationPipeline:
 # Example usage:
 if __name__ == "__main__":
     # Load your pre-trained models and components here
-    # For example:
-    # word2vec_model = gensim.models.Word2Vec.load("path_to_word2vec_model")
-    # scaler = joblib.load("path_to_scaler")
-    # pca = joblib.load("path_to_pca")
-    # classifier = joblib.load("path_to_classifier")
+    word2vec_model = gensim.models.Word2Vec.load("word2vec_model.model")
+    scaler = joblib.load("scaler.pkl")
+    pca = joblib.load("pca.pkl")
+    classifier = joblib.load("xgb_classifier.pkl")
 
     # Initialize the pipeline
     pipeline = SentimentClassificationPipeline(word2vec_model, scaler, pca, classifier)

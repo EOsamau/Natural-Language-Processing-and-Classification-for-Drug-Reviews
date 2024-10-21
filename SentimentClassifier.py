@@ -53,10 +53,31 @@ class SentimentClassificationPipeline:
         
         # Predict using the classifier
         prediction = self.classifier.predict(reduced_vector)
+        probabilities = self.classifier.predict_proba(reduced_vector)
         
         # Map prediction to sentiment label
-        sentiment_map = {0: "Negative", 1: "Neutral", 2: "Positive"}
-        return sentiment_map[prediction[0]]
+        sentiment_map = {0: "Negative", 1: "Positive"}
+        return sentiment_map[prediction[0]], probabilities[0]
+
+# Debugging function
+def debug_pipeline(pipeline, sentence):
+    print(f"Input sentence: {sentence}")
+    processed = pipeline.preprocess_text(sentence)
+    print(f"Processed text: {processed}")
+    
+    vector = pipeline.get_average_word2vec(processed.split(), pipeline.word2vec_model.vector_size)
+    print(f"Word2Vec vector shape: {vector.shape}")
+    
+    scaled = pipeline.scaler.transform(vector.reshape(1, -1))
+    print(f"Scaled vector shape: {scaled.shape}")
+    
+    reduced = pipeline.pca.transform(scaled)
+    print(f"PCA reduced vector shape: {reduced.shape}")
+    
+    prediction = pipeline.classifier.predict(reduced)
+    probabilities = pipeline.classifier.predict_proba(reduced)
+    print(f"Prediction: {prediction}")
+    print(f"Probabilities: {probabilities}")
 
 # Example usage:
 if __name__ == "__main__":
@@ -74,5 +95,9 @@ if __name__ == "__main__":
         sentence = input("Enter a sentence to classify (or 'quit' to exit): ")
         if sentence.lower() == 'quit':
             break
-        sentiment = pipeline.classify(sentence)
+        sentiment, probabilities = pipeline.classify(sentence)
         print(f"Sentiment: {sentiment}")
+        print(f"Probabilities: {probabilities}")
+        
+        # Debug the pipeline
+        debug_pipeline(pipeline, sentence)
